@@ -9,7 +9,7 @@ var WalletSchema = new Schema({
         unique: true
     },
     value:{
-        type:Number,
+        type: Number,
         required:true,
         default:0
     }

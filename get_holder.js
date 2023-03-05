@@ -17,55 +17,8 @@ const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
 getHolder = async (provider) => {
     // let lz = new ethers.Contract(lz_address, lzPool, newProvider)
     // console.log(lz.eth.call())
-    let data = await getApi(9345340, 9481531);
-    let task = [];
-
-    for (let i = 0; i < data.length; i++) {
-        // let from = await Wallet.findOne(data.from);
-        // let to = await Wallet.findOne(data.to);
-        const { from, to, value } = data[i];
-
-     //   console.log(Web3.utils.fromWei(value.substring(0, 18), "ether"));
-        const _value = +Web3.utils.fromWei(value.substring(0, 18), "ether");
-        if(from=="0xdad254728a37d1e80c21afae688c64d0383cc307" || to =="0xdad254728a37d1e80c21afae688c64d0383cc307")
-        {
-            console.log({ from, to, _value });
-        }
-
-        task.push(
-            {
-                updateOne: {
-                    filter: {
-                        address: to,
-                    },
-                    update: {
-                        $inc: {
-                            value: _value,
-                        },
-                        value_tring
-                    },
-                    upsert: true,
-                },
-            },
-            {
-                updateOne: {
-                    filter: {
-                        address: from,
-                    },
-                    update: {
-                        $inc: {
-                            value: -_value,
-                        },
-                    },
-                    upsert: true,
-                },
-            },
-        );
-
-        if (task.length == 100) {
-            await Wallet.bulkWrite(task);
-            task = [];
-        }
+    getApi(9345340, 27024419);
+    //9345340
 
         // await Promise.all([
         //     Wallet.findOneAndUpdate({address:from},{$inc:-(_value)},{upsert:true}),
@@ -83,8 +36,6 @@ getHolder = async (provider) => {
         //     let fromBlance = from.balance + value;
         //     Wallet.updateOne({ address: data.from }, { balance: toBlance });
         // }
-    }
-    await Wallet.bulkWrite(task);
 
     // let data = getApi(9345340, 26024419);
     // 3382
@@ -120,12 +71,69 @@ getHolder = async (provider) => {
 // https://api.chainbase.online/v1/token/holders?chain_id=56&contract_address=0x3b78458981eb7260d1f781cb8be2caac7027dbe2&to_block=26024419&page=2&limit=100
 
 getApi = async (fromBlock, toBlock) => {
+    console.log(`https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${lz_address}&startblock=${fromBlock}&endblock=${toBlock}&page=1&offset=10000&sort=asc&apikey=VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9`)
     const response = await fetch(
         `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${lz_address}&startblock=${fromBlock}&endblock=${toBlock}&page=1&offset=10000&sort=asc&apikey=VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9`,
     );
-    const body = JSON.parse(await response.text());
-    return body.result;
+    try {
+        const body = JSON.parse(await response.text());
+        if(body.result.length == 0) {
+            process.exit()
+        }
+        saveData(body.result);
+    } catch (error) {
+        console.log(error, {fromBlock, toBlock})
+    }
 };
+
+saveData = async (data) => {
+    let task = [];
+    for (let i = 0; i < data.length; i++) {
+        // let from = await Wallet.findOne(data.from);
+        // let to = await Wallet.findOne(data.to);
+        const { from, to, value } = data[i];
+
+        //console.log(Web3.utils.fromWei(value.substring(0, 18), "ether"));
+        const _value = +Web3.utils.fromWei(value, "ether");
+
+        task.push(
+            {
+                updateOne: {
+                    filter: {
+                        address: to,
+                    },
+                    update: {
+                        $inc: {
+                            value: _value,
+                        },
+                    },
+                    upsert: true,
+                },
+            },
+            {
+                updateOne: {
+                    filter: {
+                        address: from,
+                    },
+                    update: {
+                        $inc: {
+                            value: -_value,
+                        },
+                    },
+                    upsert: true,
+                },
+            },
+        );
+
+        if (task.length == 100) {
+            await Wallet.bulkWrite(task);
+            task = [];
+        }
+    }
+    await Wallet.bulkWrite(task);
+
+    getApi(parseInt(data[data.length-1].blockNumber) + 1, 26024419)
+}
 
 decode = (log) => {
     try {
