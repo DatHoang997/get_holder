@@ -6,7 +6,7 @@ const lz_address = "0x3B78458981eB7260d1f781cb8be2CaAC7027DbE2";
 const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
 
 getHolder = async () => {
-    await getApi(9345340, 27024419);
+    await getApi(26023452, 27024419);
     return
 };
 
@@ -23,6 +23,7 @@ getApi = async (fromBlock, toBlock) => {
         saveData(body.result);
     } catch (error) {
         console.log(error, {fromBlock, toBlock})
+        getApi(fromBlock, toBlock)
     }
 };
 
