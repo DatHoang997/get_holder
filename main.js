@@ -11,11 +11,11 @@ const api_key = [
     "U1BKBVNXX3XYF81MPEVP5V97M51IY1C1AF",
     "92PK33JCRS9A2ECTA2ZRAN8KF7TZBSVRYN]",
 ];
-const mongo_url = "mongodb://localhost:27017/get_event";
+const mongo_url = "mongodb://localhost:27017/get_events";
 
 start = async () => {
-    let provider = await getProvider();
-    getHolder(provider);
+    // let provider = await getProvider();
+    getHolder();
 };
 
 mongoose
