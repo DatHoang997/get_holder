@@ -19,10 +19,6 @@ getApi = async (fromBlock, toBlock) => {
     );
     try {
         const body = JSON.parse(await response.text());
-
-        if (body.result.length == 1) {
-            process.exit();
-        }
         saveData(body.result);
     } catch (error) {
         console.log(error, { fromBlock, toBlock });
@@ -73,6 +69,9 @@ saveData = async (data) => {
     }
     await Wallet.bulkWrite(task);
     console.log("data saved!");
+    if (data.length < 10000) {
+        process.exit();
+    }
     getApi(parseInt(data[data.length - 1].blockNumber), 26024419);
 };
 
