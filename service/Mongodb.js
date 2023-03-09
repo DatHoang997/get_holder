@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const mongo_url = "mongodb://localhost:27017/get_events";
+const mongo_url = "mongodb://localhost:27017/holders";
 
 mongoConnection = async () => {
     return mongoose
