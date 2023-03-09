@@ -54,12 +54,12 @@ saveData = async (data, lastBlock) => {
 
         await Wallet.updateOne(
             { address: from },
-            { block1: fromBalance },
+            { block1: fromBalance, block3: fromBalance, block3: fromBalance },
             { upsert: true },
         );
         await Wallet.updateOne(
             { address: to },
-            { block1: toBalance },
+            { block1: toBalance, block2: toBalance, block3: toBalance },
             { upsert: true },
         );
     }
@@ -67,7 +67,7 @@ saveData = async (data, lastBlock) => {
     if (data.length < 10000) {
         process.exit();
     }
-    console.log('continue form ', continueBlock)
+    console.log("continue form ", continueBlock);
     getApi(continueBlock, 26024419);
 };
 

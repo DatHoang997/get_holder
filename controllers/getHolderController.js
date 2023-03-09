@@ -13,13 +13,31 @@ exports.sum = [
         );
         let sum = bn(0);
         for (let holder of holders) {
-            sum = sum.add(holder.block3);
+            // if (
+            //     bn(holder.block1).lt("500000000000000000") &&
+            //     bn(holder.block1).gt("0")
+            // )
+                sum = sum.add(holder.block1);
         }
         return apiResponse.successResponseWithData(
             res,
             "Operation success",
             sum.toString(),
         );
+    },
+];
+
+exports.copy = [
+    async (req, res) => {
+        console.log("copyBlock");
+        let holders = await Wallet.find({});
+        for (let holder of holders) {
+            await Wallet.updateOne(
+                { address: holder.address },
+                { block2: holder.block1, block3: holder.block1 },
+            );
+        }
+        return apiResponse.successResponseWithData(res, "Operation success");
     },
 ];
 
