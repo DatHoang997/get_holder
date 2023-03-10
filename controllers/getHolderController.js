@@ -17,7 +17,7 @@ exports.sum = [
             //     bn(holder.block1).lt("500000000000000000") &&
             //     bn(holder.block1).gt("0")
             // )
-                sum = sum.add(holder.block1);
+            sum = sum.add(holder.block1);
         }
         return apiResponse.successResponseWithData(
             res,
@@ -46,13 +46,14 @@ exports.getHolder = [
         let holder = await Wallet.find(
             {},
             { address: 1, block1: 1, block2: 1, block3: 1, _id: 0 },
-        );
+        ).lean();
         fs = require("fs");
+        let result = JSON.stringify(holder);
+        await fs.writeFileSync("holder.json", result, (error) => {});
 
         return apiResponse.successResponseWithData(
             res,
-            "Operation success",
-            holder,
+            "Operation success"
         );
     },
 ];
