@@ -1,8 +1,10 @@
 fs = require("fs");
-const { utils, ethers } = require("ethers");
+const HackedData = require("../models/hacked_data");
+const { ethers } = require("ethers");
 const apiResponse = require("../helpers/apiResponse");
 const Wallet = require("../models/events");
 const holder = require("../holder.json");
+const wallet = require("../wallet.json");
 const bn = ethers.BigNumber.from;
 
 exports.sum = [
@@ -58,6 +60,23 @@ exports.getHolder = [
     },
 ];
 
+exports.getHacked = [
+    async (req, res) => {
+        let wallet = await HackedData.find(
+            {},
+            { tx_hash: 1, address: 1, spender: 1, owner: 1, tx_origin: 1, _id: 0 },
+        ).lean();
+        fs = require("fs");
+        let result = JSON.stringify(wallet);
+        await fs.writeFileSync("wallet.json", result, (error) => {});
+
+        return apiResponse.successResponseWithData(
+            res,
+            "Operation success"
+        );
+    },
+];
+
 exports.excel = [
     async (req, res) => {
         const xl = require("excel4node");
@@ -79,14 +98,14 @@ exports.excel = [
         });
         //Write Data in Excel file
         let rowIndex = 2;
-        data.forEach((record) => {
+        wallet.forEach((record) => {
             let columnIndex = 1;
             Object.keys(record).forEach((columnName) => {
                 ws.cell(rowIndex, columnIndex++).string(record[columnName]);
             });
             rowIndex++;
         });
-        await wb.write("data.xlsx");
+        await wb.write("wallet.xlsx");
         return apiResponse.successResponseWithData(res, "Operation success");
     },
 ];

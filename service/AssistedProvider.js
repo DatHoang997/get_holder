@@ -26,3 +26,7 @@ getProvider = async () => {
         },
     ));
 };
+
+module.exports = {
+    getProvider,
+};
