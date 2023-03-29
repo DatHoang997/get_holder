@@ -15,7 +15,7 @@ const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
 
 const bn = ethers.BigNumber.from;
 
-const range = 1000;
+const range = 10000;
 
 module.exports = {
     swapXContract,

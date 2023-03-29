@@ -10,6 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "@ethersproject/providers": "https://github.com/launchzone/ethers.js/releases/download/v5.3.1.1/ethers_providers.tar.gz",
+    "@moralisweb3/core": "^2.7.4",
+    "@moralisweb3/evm": "^2.0.0-alpha.2",
+    "@moralisweb3/evm-api": "^2.15.0",
+    "@moralisweb3/evm-utils": "^2.15.0",
+    "@moralisweb3/evm-wallet-connect-connector": "^2.0.0-alpha.2",
     "assisted-json-rpc-provider": "^2.0.2",
     "cookie-parser": "^1.4.6",
     "ethers": "^5.1.4",
@@ -19,6 +24,7 @@
     "mongodb": "4.1.2",
     "mongoose": "6.0.2",
     "mongoose-long": "^0.6.0",
+    "moralis": "^2.15.0",
     "node-fetch": "^2.6.9",
     "web3": "^1.8.2"
   }

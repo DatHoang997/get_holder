@@ -33,6 +33,26 @@ var HackedDataSchema = new Schema(
             type: String,
             required: false,
         },
+        contract: {
+            type: String,
+            required: false,
+        },
+        symbol: {
+            type: String,
+            required: false,
+        },
+        decimal: {
+            type: String,
+            required: false,
+        },
+        price: {
+            type: String,
+            required: false,
+        },
+        contract: {
+          type: String,
+          required: false,
+      }
     },
     { timestamps: false },
 );

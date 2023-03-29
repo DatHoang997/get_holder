@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var HackedSchema = new Schema(
     {
-        tx_hast: {
+        tx_hash: {
             type: String,
             required: true,
         },

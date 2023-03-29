@@ -24,6 +24,11 @@ var WalletSchema = new Schema(
             required: false,
             default: 0,
         },
+        contract: {
+            type: String,
+            required: false,
+            default: 0,
+        }
     },
     { timestamps: false },
 );
