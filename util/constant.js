@@ -7,6 +7,7 @@ const swapXContract = [
     "0x000000000000000000000000618bec079bc8f419b86d8d5a63b58f04af127d6a",
     "0x00000000000000000000000098c2581ab3f11b0d4ffb1271fad96eadb9dbbb6d",
     "0x00000000000000000000000008b2681a178a6b8c6d39e542756369d60a0e6eda",
+    "0x00000000000000000000000026585626e4a8d4fc409146b47a61790d9008967c"
 ];
 
 const lz_address = "0x3b78458981eb7260d1f781cb8be2caac7027dbe2";
@@ -15,7 +16,7 @@ const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
 
 const bn = ethers.BigNumber.from;
 
-const range = 10000;
+const range = 1000;
 
 module.exports = {
     swapXContract,
