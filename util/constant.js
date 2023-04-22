@@ -16,6 +16,10 @@ const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
 
 const bn = ethers.BigNumber.from;
 
+const contract_address = '0x3b78458981eb7260d1f781cb8be2caac7027dbe2'
+
+const wallet_address = '0x4b02873EC91D6763557FB36aA847B340e580930b'
+
 const range = 1000;
 
 module.exports = {
@@ -23,5 +27,7 @@ module.exports = {
     lz_address,
     api_key,
     bn,
-    range
+    range,
+    contract_address,
+    wallet_address
 };

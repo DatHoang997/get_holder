@@ -12,7 +12,7 @@ const { getProvider } = require("./service/AssistedProvider");
 
 start = async () => {
     await mongoConnection();
-    getTx();
+    getHolder();
 };
 
 start();

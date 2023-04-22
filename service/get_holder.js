@@ -6,11 +6,12 @@ const BottomFishing = require("../models/bottom_fishing");
 const Web3 = require("web3");
 const fetch = require("node-fetch");
 const {
-  swapXContract,
   range,
   bn,
   api_key,
   lz_address,
+  wallet_address,
+  contract_address,
 } = require("../util/constant");
 const endpoint = `https://bsc-dataseed1.defibit.io`;
 const web3Default = new Web3(endpoint);
@@ -19,25 +20,25 @@ const user_wallet = require("../user_wallet.json");
 fs = require("fs");
 
 getHolder = async () => {
-  await getApi(0, 26024420); //26024907
+  await getApi(0, 26024907); //26024907
 };
 
 getApi = async (fromBlock, toBlock) => {
-  // const url = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${'0xDb821BB482cfDae5D3B1A48EeaD8d2F74678D593'}&startblock=${fromBlock}&endblock=${toBlock}&page=1&offset=${range}&sort=asc&apikey=${api_key}`;
-  const url = `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925&topic0_2_opr=and&topic2=${swapXContract[6]}&apikey=${api_key}`;
+  const url = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contract_address}&address=${wallet_address}&startblock=${fromBlock}&endblock=${toBlock}&page=1&offset=${range}&sort=asc&apikey=${api_key}`;
+  // const url = `https://api.bscscan.com/api?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925&topic0_2_opr=and&topic2=${swapXContract[6]}&apikey=${api_key}`;
   const response = await fetch(url);
   console.log(url);
   try {
     const body = JSON.parse(await response.text());
-    console.log(body.result.length);
-    const lastBlock = parseInt(
-      body.result[body.result.length - 1].blockNumber,
-      16,
-    );
-    await saveData(body.result, lastBlock, toBlock);
+    console.log(body.result);
+    // const lastBlock = parseInt(
+    //   body.result[body.result.length - 1].blockNumber,
+    //   16,
+    // );
+    // await saveData(body.result, lastBlock, toBlock);
   } catch (error) {
     console.log(error, { fromBlock, toBlock });
-    getApi(fromBlock, toBlock);
+    // getApi(fromBlock, toBlock);
   }
 };
 
@@ -100,14 +101,14 @@ const getTx = async () => {
       tx = await web3Default.eth.getTransactionReceipt(data[i].tx_hash);
     } catch (error) {
       console.log(error);
-      getTx()
+      getTx();
     }
     // console.log(tx)
     // process.exit()
     console.log(i + 1, "/", data.length);
-    console.log(data[i].tx_hash, tx.from, data[i].owner.toLowerCase())
+    console.log(data[i].tx_hash, tx.from, data[i].owner.toLowerCase());
     if (tx.from == data[i].owner.toLowerCase()) {
-      await HackedData.deleteOne({_id: data[i]._id});
+      await HackedData.deleteOne({ _id: data[i]._id });
     }
     for (let log of tx.logs) {
       if (
@@ -116,13 +117,13 @@ const getTx = async () => {
         log.topics[1] == data[i].owner &&
         log.topics[2] == data[i].spender
       ) {
-        let amount = parseInt(log.data, 16)
+        let amount = parseInt(log.data, 16);
         await HackedData.updateOne(
           { _id: data[i]._id },
           {
             tx_origin: tx.from,
             blocknumber: tx.blockNumber,
-            amount
+            amount,
           },
         );
       }
@@ -153,73 +154,73 @@ const getTxInfo = async () => {
   }
 };
 
-// saveData = async (data, lastBlock, toBlock) => {
-//     console.log("saving data...");
-//     let continueBlock = parseInt(data[data.length - 1].blockNumber) + 1;
-//     for (let i = 0; i < data.length - 1; i++) {
-//         if (data.length == range && data[i].blockNumber == lastBlock) {
-//             continueBlock = parseInt(data[data.length - 1].blockNumber);
-//             continue;
-//         }
-
-//         const { from, to, value } = data[i];
-
-//         const fromWallet = await Lp.findOne({ address: from }).lean();
-//         const toWallet = await Lp.findOne({ address: to }).lean();
-
-//         let fromBalance, toBalance;
-//         if (!fromWallet) fromBalance = bn("0").sub(value);
-//         if (!toWallet) toBalance = bn("0").add(value);
-
-//         if (fromWallet) fromBalance = bn(fromWallet.block1).sub(value);
-//         if (toWallet) toBalance = bn(toWallet.block3).add(value);
-
-//         await Lp.updateOne(
-//             { address: from },
-//             { block1: fromBalance, block2: fromBalance, block3: fromBalance },
-//             { upsert: true },
-//         );
-//         await Lp.updateOne(
-//             { address: to },
-//             { block1: toBalance, block2: toBalance, block3: toBalance },
-//             { upsert: true },
-//         );
-//     }
-//     console.log("data saved!");
-//     if (data.length < range) {
-//         process.exit();
-//     }
-//     console.log("continue form ", continueBlock);
-//     getApi(continueBlock, toBlock);
-// };
-
 saveData = async (data, lastBlock, toBlock) => {
   console.log("saving data...");
-  let continueBlock = lastBlock + 1;
-  for (let i = 0; i < data.length; i++) {
+  let continueBlock = parseInt(data[data.length - 1].blockNumber) + 1;
+  for (let i = 0; i < data.length - 1; i++) {
     if (data.length == range && data[i].blockNumber == lastBlock) {
-      continueBlock = lastBlock;
+      continueBlock = parseInt(data[data.length - 1].blockNumber);
       continue;
     }
-    let owner = Web3.utils.toChecksumAddress(
-      "0x" + data[i].topics[1].slice(26),
+
+    const { from, to, value } = data[i];
+
+    const fromWallet = await Lp.findOne({ address: from }).lean();
+    const toWallet = await Lp.findOne({ address: to }).lean();
+
+    let fromBalance, toBalance;
+    if (!fromWallet) fromBalance = bn("0").sub(value);
+    if (!toWallet) toBalance = bn("0").add(value);
+
+    if (fromWallet) fromBalance = bn(fromWallet.block1).sub(value);
+    if (toWallet) toBalance = bn(toWallet.block3).add(value);
+
+    await Lp.updateOne(
+      { address: from },
+      { block1: fromBalance, block2: fromBalance, block3: fromBalance },
+      { upsert: true },
     );
-    let spender = Web3.utils.toChecksumAddress(
-      "0x" + data[i].topics[2].slice(26),
+    await Lp.updateOne(
+      { address: to },
+      { block1: toBalance, block2: toBalance, block3: toBalance },
+      { upsert: true },
     );
-    await HackedData.create({
-      tx_hash: data[i].transactionHash,
-      address: Web3.utils.toChecksumAddress(data[i].address),
-      owner,
-      spender,
-    });
   }
   console.log("data saved!");
   if (data.length < range) {
     process.exit();
   }
+  console.log("continue form ", continueBlock);
   getApi(continueBlock, toBlock);
 };
+
+// saveData = async (data, lastBlock, toBlock) => {
+//   console.log("saving data...");
+//   let continueBlock = lastBlock + 1;
+//   for (let i = 0; i < data.length; i++) {
+//     if (data.length == range && data[i].blockNumber == lastBlock) {
+//       continueBlock = lastBlock;
+//       continue;
+//     }
+//     let owner = Web3.utils.toChecksumAddress(
+//       "0x" + data[i].topics[1].slice(26),
+//     );
+//     let spender = Web3.utils.toChecksumAddress(
+//       "0x" + data[i].topics[2].slice(26),
+//     );
+//     await HackedData.create({
+//       tx_hash: data[i].transactionHash,
+//       address: Web3.utils.toChecksumAddress(data[i].address),
+//       owner,
+//       spender,
+//     });
+//   }
+//   console.log("data saved!");
+//   if (data.length < range) {
+//     process.exit();
+//   }
+//   getApi(continueBlock, toBlock);
+// };
 
 // const saveData = async (data, lastBlock, toBlock) => {
 //     console.log("saving data...");
