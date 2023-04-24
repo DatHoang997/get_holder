@@ -1,11 +1,11 @@
 fs = require("fs");
 const HackedData = require("../models/hacked_data");
 const { ethers } = require("ethers");
+const bn = ethers.BigNumber.from;
 const apiResponse = require("../helpers/apiResponse");
 const Wallet = require("../models/events");
 const BottomFishing = require("../models/bottom_fishing");
 const Lp = require("../models/lp");
-const bn = ethers.BigNumber.from;
 const Address = require("../models/address");
 const data1 = require("../data1.json");
 const data = require("../data.json");
