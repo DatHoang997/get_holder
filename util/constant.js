@@ -20,6 +20,8 @@ const contract_address = '0x3b78458981eb7260d1f781cb8be2caac7027dbe2'
 
 const wallet_address = '0x4b02873EC91D6763557FB36aA847B340e580930b'
 
+const moralis_api_key = "h8W3Cec6jECRLzi6LxW7rKCTxS2DPiPrDjBIwopqF41Y9A7nn53Zq58VMA8oY9uH";
+
 const range = 1000;
 
 module.exports = {
@@ -29,5 +31,6 @@ module.exports = {
     bn,
     range,
     contract_address,
-    wallet_address
+    wallet_address,
+    moralis_api_key,
 };

@@ -8,8 +8,10 @@ const {
     checkWalletContract,
     getTo,
     format,
-    userSwap,
 } = require("./service/get_holder");
+const {
+  userSwap,
+} = require("./service/user_swap");
 const { mongoConnection } = require("./service/Mongodb");
 const { getProvider } = require("./service/AssistedProvider");
 

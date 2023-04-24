@@ -16,6 +16,7 @@ const {
   lz_address,
   wallet_address,
   contract_address,
+  moralis_api_key,
 } = require("../util/constant");
 const endpoint = "https://rpc.ankr.com/bsc";
 const web3Default = new Web3(endpoint);
@@ -354,9 +355,9 @@ async function format() {
 }
 let userSwapData = [];
 async function userSwap() {
-  // const wallet_address = "0x4b02873EC91D6763557FB36aA847B340e580930b";
-  const wallet_address = "0xf143390c89c10b4875de529b2c53ebf344b346eb";
-  const contract_address = "0x6fe9e9de56356f7edbfcbb29fab7cd69471a4869";
+  const wallet_address = "0x4b02873EC91D6763557FB36aA847B340e580930b";
+  // const wallet_address = "0x3e0d064e079f93b3ed7a023557fc9716bcbb20ae";
+  const contract_address = "0x2d518fdcc1c8e89b1abc6ed73b887e12e61f06de";
   let cursor = null;
   try {
     await getAPIs(wallet_address, cursor, contract_address);
@@ -366,14 +367,13 @@ async function userSwap() {
 }
 
 async function getAPIs(wallet_address, cursor, contract_address) {
-  const api_key =
-    "h8W3Cec6jECRLzi6LxW7rKCTxS2DPiPrDjBIwopqF41Y9A7nn53Zq58VMA8oY9uH";
   const headers = {
-    "X-API-Key": api_key,
+    "X-API-Key": moralis_api_key,
   };
   const url = `https://deep-index.moralis.io/api/v2/erc20/transfers?chain=bsc&wallet_addresses%5B0%5D=${wallet_address}&from_block=0&to_block=28710816${
     cursor ? "&cursor=" + cursor : ""
   }`;
+  console.log(url)
   const response = await fetch(url, { headers });
   const body = JSON.parse(await response.text());
   userSwapData = userSwapData.concat(body.result);
