@@ -5,11 +5,12 @@ const bn = ethers.BigNumber.from;
 let userSwapData = [];
 const moralis_api_key =
   "h8W3Cec6jECRLzi6LxW7rKCTxS2DPiPrDjBIwopqF41Y9A7nn53Zq58VMA8oY9uH";
-const wallet_address = "0xe97e438826bc42a04a32e6d89576705135d96e12";
-const contract_address = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae";
+const wallet_address = "0xbe8784E13d95020Ad182af4Ca1560287b493AAF9";
+const contract_address = "0x400d7f19ca189762d7944a62ea351db8de54f571";
+const chain = 'arbitrum';
+//bsc arbitrum
 
 async function userSwap() {
-  // const wallet_address = "0x3e0d064e079f93b3ed7a023557fc9716bcbb20ae";
   let cursor = null;
   try {
     await getAPIs(cursor);
@@ -17,28 +18,66 @@ async function userSwap() {
     console.log("error", error);
   }
 }
+async function getNavtive(data) {
+  const headers = {
+    "X-API-Key": moralis_api_key,
+  };
+  const url = `https://deep-index.moralis.io/api/v2/transaction/${data.transaction_hash}/verbose?chain=${chain}`;
+  console.log(url);
+  let nativeData = [];
+  const response = await fetch(url, { headers });
+  const body = await response.json();
+  for (let log of body.logs) {
+    if (
+      log.topic2 != null &&
+      log.topic1 ==
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+    ) {
+      nativeData = [
+        {
+          contract_address: log.address,
+          value: log.transaction_value,
+        },
+        data,
+      ];
+    }
+    if (
+      log.topic1 != null &&
+      log.topic2 ==
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+    ) {
+      nativeData = [
+        data,
+        {
+          contract_address: log.address,
+          value: log.transaction_value,
+        },
+      ];
+    }
+  }
+  return nativeData;
+}
 
 async function getAPIs(cursor) {
   const headers = {
     "X-API-Key": moralis_api_key,
   };
-  const url = `https://deep-index.moralis.io/api/v2/erc20/transfers?chain=bsc&wallet_addresses%5B0%5D=${wallet_address}&from_block=0&to_block=28710816${
+  const url = `https://deep-index.moralis.io/api/v2/erc20/transfers?chain=${chain}&wallet_addresses%5B0%5D=${wallet_address}${
     cursor ? "&cursor=" + cursor : ""
   }`;
   console.log(url);
   const response = await fetch(url, { headers });
-  const body = JSON.parse(await response.text());
+  const body = await response.json();
   userSwapData = userSwapData.concat(body.result);
   if (body.cursor) {
     getAPIs(body.cursor);
     return;
   }
-  // console.log("END", userSwapData);
-  pairSwap(contract_address);
+  pairSwap();
   return;
 }
 
-async function pairSwap(contract_address) {
+async function pairSwap() {
   let results = [];
   for (let i = 1; i < userSwapData.length; i++) {
     if (
@@ -46,7 +85,9 @@ async function pairSwap(contract_address) {
       userSwapData[i].to_wallet == contract_address
     ) {
       if (
-        userSwapData[i].transaction_hash == userSwapData[i + 1].transaction_hash
+        userSwapData[i].transaction_hash ==
+          userSwapData[i + 1].transaction_hash &&
+        userSwapData[i].contract_address != userSwapData[i + 1].contract_address
       ) {
         results.push([userSwapData[i], userSwapData[i + 1]]);
         i++;
@@ -54,9 +95,19 @@ async function pairSwap(contract_address) {
       }
       if (i == 0) continue;
       if (
-        userSwapData[i].transaction_hash == userSwapData[i - 1].transaction_hash
+        userSwapData[i].transaction_hash ==
+          userSwapData[i - 1].transaction_hash &&
+        userSwapData[i].contract_address != userSwapData[i - 1].contract_address
       ) {
-        results.push([userSwapData[i], userSwapData[i - 1]]);
+        results.push([userSwapData[i - 1], userSwapData[i]]);
+        continue;
+      } else {
+        try {
+          let native = await getNavtive(userSwapData[i]);
+          results.push(native);
+        } catch (error) {
+          console.log("error", error);
+        }
       }
     }
   }
@@ -79,7 +130,7 @@ async function pairSwap(contract_address) {
       amountD = amountD.add(results[i][1].value);
     }
   }
-  console.log(results)
+
   console.log({
     results,
     buy: {
