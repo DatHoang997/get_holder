@@ -1,8 +1,7 @@
 const { AssistedJsonRpcProvider } = require("assisted-json-rpc-provider");
 const { JsonRpcProvider } = require("@ethersproject/providers");
 
-const rpc =
-    "https://bsc-mainnet.nodereal.io/v1/eb8693749b3e481781d8ab685c3b9c3c";
+const rpc ="https://bsc.rpc.blxrbdn.com	";
 const bsc_api = "https://api.bscscan.com/api";
 const api_key = [
     "HBCK76GVW2FKXRECNV5MFYF4S4PWENZ8AY",

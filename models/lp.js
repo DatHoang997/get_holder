@@ -6,7 +6,6 @@ var LpSchema = new Schema(
     {
         address: {
             type: String,
-            required: true,
             unique: true,
         },
         block1: {

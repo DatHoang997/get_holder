@@ -6,8 +6,9 @@ const Wallet = require("../models/events");
 const BottomFishing = require("../models/bottom_fishing");
 const Lp = require("../models/lp");
 const bn = ethers.BigNumber.from;
-const bs = require("../BottomFishing.json");
-const lp = require("../lp.json");
+const Address = require("../models/address");
+const data1 = require("../data1.json");
+const data = require("../data.json");
 const Tx = require("../models/tx");
 
 exports.sum = [
@@ -75,18 +76,17 @@ exports.getHolder = [
 
 exports.getLP = [
   async (req, res) => {
-    let holder = await Lp.find(
+    let holder = await Tx.find(
       {},
       {
         _id: 0,
         __v: 0,
-        contract: 0
       },
     ).lean();
     fs = require("fs");
 
     let result = JSON.stringify(holder);
-    await fs.writeFileSync("lp.json", result, (error) => {});
+    await fs.writeFileSync("data.json", result, (error) => {});
 
     return apiResponse.successResponseWithData(res, "Operation success");
   },
@@ -97,24 +97,14 @@ exports.getHacked = [
     let wallet = await HackedData.find(
       {},
       {
-        tx_hash: 1,
-        address: 1,
-        spender: 1,
-        owner: 1,
-        tx_origin: 1,
-        blockNumber: 1,
-        contract: 1,
-        amount: 1,
-        symbol: 1,
-        decimal: 1,
-        price: 1,
+        __v: 0,
         _id: 0,
       },
     ).lean();
     console.log(wallet);
     fs = require("fs");
     let result = JSON.stringify(wallet);
-    await fs.writeFileSync("last.json", result, (error) => {});
+    await fs.writeFileSync("data1.json", result, (error) => {});
 
     return apiResponse.successResponseWithData(res, "Operation success");
   },
@@ -125,19 +115,16 @@ exports.excel = [
     const xl = require("excel4node");
     const wb = new xl.Workbook();
     const ws = wb.addWorksheet("Worksheet Name");
-    const data = [
-      {
-        address: "0x0e7165087d3ac987c695739f26ae164ee0078e2b",
-        block1: "1520677072980000",
-        block2: "1520677072980000",
-        block3: "1520677072980000",
-      },
-    ];
+    // const data = [
+    //   {
+    //     address: "0x0e7165087d3ac987c695739f26ae164ee0078e2b",
+    //     block1: "1520677072980000",
+    //     block2: "1520677072980000",
+    //     block3: "1520677072980000",
+    //   },
+    // ];
     const headingColumnNames = [
-      "Address",
-      "Block1",
-      "Block2",
-      "Block3",
+
     ];
     //Write Column Title in Excel file
     let headingColumnIndex = 1;
@@ -146,14 +133,14 @@ exports.excel = [
     });
     //Write Data in Excel file
     let rowIndex = 2;
-    lp.forEach((record) => {
+    data.forEach((record) => {
       let columnIndex = 1;
       Object.keys(record).forEach((columnName) => {
         ws.cell(rowIndex, columnIndex++).string(record[columnName]);
       });
       rowIndex++;
     });
-    await wb.write("0xDb821BB482cfDae5D3B1A48EeaD8d2F74678D593.xlsx");
+    await wb.write("to.xlsx");
     return apiResponse.successResponseWithData(res, "Operation success");
   },
 ];
