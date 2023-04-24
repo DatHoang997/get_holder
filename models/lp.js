@@ -2,11 +2,10 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-var WalletSchema = new Schema(
+var LpSchema = new Schema(
     {
         address: {
             type: String,
-            required: true,
             unique: true,
         },
         block1: {
@@ -23,14 +22,9 @@ var WalletSchema = new Schema(
             type: String,
             required: false,
             default: 0,
-        },
-        contract: {
-            type: String,
-            required: false,
-            default: 0,
         }
     },
     { timestamps: false },
 );
 
-module.exports = mongoose.model("wallet", WalletSchema);
+module.exports = mongoose.model("lp", LpSchema);
