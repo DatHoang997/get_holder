@@ -5,8 +5,8 @@ const bn = ethers.BigNumber.from;
 let userSwapData = [];
 const moralis_api_key =
   "h8W3Cec6jECRLzi6LxW7rKCTxS2DPiPrDjBIwopqF41Y9A7nn53Zq58VMA8oY9uH";
-const wallet_address = "0x4b02873EC91D6763557FB36aA847B340e580930b";
-const contract_address = "0x2d518fdcc1c8e89b1abc6ed73b887e12e61f06de";
+const wallet_address = "0xe97e438826bc42a04a32e6d89576705135d96e12";
+const contract_address = "0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae";
 
 async function userSwap() {
   // const wallet_address = "0x3e0d064e079f93b3ed7a023557fc9716bcbb20ae";
@@ -33,7 +33,7 @@ async function getAPIs(cursor) {
     getAPIs(body.cursor);
     return;
   }
-  console.log("END", userSwapData.length);
+  // console.log("END", userSwapData);
   pairSwap(contract_address);
   return;
 }
@@ -79,19 +79,20 @@ async function pairSwap(contract_address) {
       amountD = amountD.add(results[i][1].value);
     }
   }
+  console.log(results)
   console.log({
     results,
     buy: {
       tokenA,
-      amountA: ethers.utils.formatEther(amountA.toString()),
+      amountIn: ethers.utils.formatEther(amountA.toString()),
       tokenB,
-      amountB: ethers.utils.formatEther(amountB.toString()),
+      amountOUT: ethers.utils.formatEther(amountB.toString()),
     },
     sell: {
       tokenA,
-      amountA: ethers.utils.formatEther(amountD.toString()),
+      amountIN: ethers.utils.formatEther(amountD.toString()),
       tokenB,
-      amountB: ethers.utils.formatEther(amountC.toString()),
+      amountOUT: ethers.utils.formatEther(amountC.toString()),
     },
   });
 }
