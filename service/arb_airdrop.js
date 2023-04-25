@@ -27,9 +27,9 @@ const getApi = async (fromBlock, toBlock) => {
 saveData = async (data, lastBlock, toBlock) => {
   console.log("saving data...");
   let continueBlock = parseInt(data[data.length - 1].blockNumber) + 1;
-  let x = true;
+  let x = false;
   if (data[0].blockNumber == data[data.length - 1].blockNumber) {
-    x = false;
+    x = true;
   }
   for (let i = 0; i < data.length - 1; i++) {
     if (data.length == range && data[i].blockNumber == lastBlock && !x) {
