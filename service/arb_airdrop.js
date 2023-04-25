@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
-const range = 1000
+const range = 1000;
 fs = require("fs");
+let savingData = [];
 
 const getWallet = async () => {
   await getApi(0, 84064042); //26024907
@@ -12,12 +13,10 @@ const getApi = async (fromBlock, toBlock) => {
   console.log(url);
   try {
     const body = JSON.parse(await response.text());
-    console.log(body.result.length);
     const lastBlock = parseInt(
       body.result[body.result.length - 1].blockNumber,
       16,
     );
-    console.log(lastBlock);
     await saveData(body.result, lastBlock, toBlock);
   } catch (error) {
     console.log(error, { fromBlock, toBlock });
@@ -27,22 +26,26 @@ const getApi = async (fromBlock, toBlock) => {
 
 saveData = async (data, lastBlock, toBlock) => {
   console.log("saving data...");
-  let savingData = []
   let continueBlock = parseInt(data[data.length - 1].blockNumber) + 1;
+  let x = true;
+  if (data[0].blockNumber == data[data.length - 1].blockNumber) {
+    x = false;
+  }
   for (let i = 0; i < data.length - 1; i++) {
-    if (data.length == range && data[i].blockNumber == lastBlock) {
+    if (data.length == range && data[i].blockNumber == lastBlock && !x) {
       continueBlock = parseInt(data[data.length - 1].blockNumber);
       continue;
     }
-    const address = data[i].topics[1].slice(0,2) + data[i].topics[1].slice(25)
-    const amount = parseInt(data[i].data, 16)
-    console.log({address, amount})
-    // savingData.push({address, amount})
+    const address = data[i].topics[1].slice(0, 2) + data[i].topics[1].slice(25);
+    const amount = parseInt(data[i].data, 16);
+    console.log({ address, amount });
+    savingData.push({ address, amount });
   }
-  let config = JSON.stringify(savingData);
-  await fs.writeFileSync("arb.json", config, (error) => {});
+
   console.log("data saved!");
   if (data.length < range) {
+    let config = JSON.stringify(savingData);
+    await fs.writeFileSync("arb.json", config, (error) => {});
     process.exit();
   }
   console.log("continue form ", continueBlock);
