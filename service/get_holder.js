@@ -26,8 +26,8 @@ const update = require("../models/update")
 fs = require("fs")
 
 const getHolder = async () => {
-  // decode()
-  await getApi(14442835, 40000000) //26024907
+  decode()
+  // await getApi(17568304, 41000000) //26024907
   // console.log(await DataDb.find())
 }
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
@@ -58,7 +58,8 @@ const decode = async () => {
   let iface = new utils.Interface([
     "event UpdatePosition (bytes32 key, uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, uint256 reserveAmount, int256 realisedPnl)",
   ])
-  const logs = await DataDb.find({blockNumber: {$lt: 40000000}})
+  const logs = await DataDb.find({blockNumber: {$lt: 10000000}})
+  console.log(logs.length)
   for await (let log of logs) {
     const data = {
       topics: [log.topics],
@@ -77,8 +78,8 @@ const decode = async () => {
       timesStamp: parseInt(log.timesStamp)
     }
     let newUpdate = new update(saveData)
-    newUpdate.save()
-    console.log("@@@@", saveData)
+    await newUpdate.save()
+    // console.log("@@@@", saveData)
   }
 }
 
