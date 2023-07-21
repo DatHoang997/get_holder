@@ -12,15 +12,13 @@ const {
 const {
   userSwap,
 } = require("./service/user_swap");
-const {
-  getWallet,
-} = require("./service/arb_airdrop");
+
 const { mongoConnection } = require("./service/Mongodb");
 const { getProvider } = require("./service/AssistedProvider");
 
 start = async () => {
-    // await mongoConnection();
-    getWallet();
+    await mongoConnection();
+    getHolder();
 };
 
 start();

@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-var DataSchema = new Schema(
+var UpdatePositionSchema = new Schema(
     {
         txHash: {
             type: String,
@@ -23,12 +23,12 @@ var DataSchema = new Schema(
             default: 0,
         },
         blockNumber: {
-            type: String,
+            type: Number,
             required: true,
             default: 0,
         },
         timesStamp: {
-            type: String,
+            type: Number,
             required: true,
             default: 0,
         },
@@ -36,4 +36,4 @@ var DataSchema = new Schema(
     { timestamps: false },
 );
 
-module.exports = mongoose.model("hacked", DataSchema);
+module.exports = mongoose.model("UpdatePosition", UpdatePositionSchema);
