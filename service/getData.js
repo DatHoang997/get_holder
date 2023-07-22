@@ -25,7 +25,7 @@ const update = require("../models/liquidate")
 fs = require("fs")
 
 const getData = async () => {
-  await getApi(0, 41000000) //26024907
+  await getDercrease(0, 40000000) //26024907
 }
 
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
@@ -34,68 +34,167 @@ const getData = async () => {
 // 0x25e8a331a7394a9f09862048843323b00bdbada258f524f5ce624a45bf00aabb UpdatePosition
 // 0x73af1d417d82c240fdb6d319b34ad884487c6bf2845d98980cc52ad9171cb455 ClosePosition
 
-const getApi = async (fromBlock, toBlock) => {
-  const url = `https://api.arbiscan.io/api?module=logs&action=getLogs&topic0=0x25e8a331a7394a9f09862048843323b00bdbada258f524f5ce624a45bf00aabb&fromBlock=${fromBlock}&toBlock=${toBlock}&apikey=${api_key}`
-  const response = await fetch(url)
-  console.log(url)
-  try {
-    const body = JSON.parse(await response.text())
-    if (body.status == '0') {
-      console.log('FALSE',{
-        fromBlock,
-        toBlock
-      })
-      process.exit()
-    }
-    console.log(body.status)
-    const lastBlock = parseInt(
-      body.result[body.result.length - 1].blockNumber,
-      16,
-    )
-    await saveData(body.result, lastBlock, toBlock)
-  } catch (error) {
-    console.log(error, { fromBlock, toBlock })
-    setTimeout(() => {
-      getApi(fromBlock, toBlock)
-    }, 5000)
-  }
+const DecreasePosition =
+  "0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30"
+const IncreasePosition =
+  "0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022"
+const LiquidatePosition =
+  "0x2e1f85a64a2f22cf2f0c42584e7c919ed4abe8d53675cff0f62bf1e95a1c676f"
+
+const getDercrease = async (fromBlock, toBlock) => {
+  const splitData = []
+  let DercreaseData = await getApi(DecreasePosition, fromBlock, toBlock)
+  splitData.push(DercreaseData.savingData)
+  await wait(100)
+  let IncreasedataRaw = await getApi(
+    IncreasePosition,
+    fromBlock,
+    DercreaseData.continueBlock,
+  )
+  splitData.push(IncreasedataRaw.savingData)
+  await wait(100)
+  let LiquidatedataRaw = await getApi(
+    LiquidatePosition,
+    fromBlock,
+    DercreaseData.continueBlock,
+  )
+  splitData.push(LiquidatedataRaw.savingData)
+  await wait(100)
+  await mergeData(splitData, DercreaseData.continueBlock)
+  if (DecreasePosition.stop) process.exit()
+  // await getDercrease(continueBlock, toBlock)
 }
 
-const saveData = async (data, lastBlock, toBlock) => {
-  console.log("saving data...")
-  let continueBlock = parseInt(data[data.length - 1].blockNumber) + 1
+const getApi = async (topic, fromBlock, toBlock) => {
+  const url = `https://api.arbiscan.io/api?module=logs&action=getLogs&topic0=${topic}&fromBlock=${fromBlock}&toBlock=${toBlock}&apikey=${api_key}`
+  console.log(url)
+  const response = await fetch(url)
+  let retries = 0
+
+  while (retries < 100) {
+    try {
+      const body = JSON.parse(await response.text())
+      if (body.status == "0") {
+        console.log("FALSE", { url })
+      }
+      const lastBlock = parseInt(
+        body.result[body.result.length - 1].blockNumber,
+      )
+      return await saveData(body.result, lastBlock, toBlock)
+    } catch (error) {
+      retries++
+      console.log(`FALSE ${url}`)
+      await wait(5000)
+    }
+  }
+
+  process.exit()
+}
+
+const saveData = async (data, lastBlock) => {
+  let continueBlock = lastBlock - 1
   const savingData = []
   for await (let a of data) {
     if (data.length == range && a.blockNumber == lastBlock) {
-      continueBlock = parseInt(data[data.length - 1].blockNumber)
       continue
     }
     savingData.push(fomatData(a))
   }
-  await DataDb.bulkWrite(savingData)
-  console.log("data saved!")
   if (data.length < range) {
-    process.exit()
+    return { continueBlock, savingData, stop: true }
   }
   console.log("continue form ", continueBlock)
-  setTimeout(() => {
-    getApi(continueBlock, toBlock)
-  }, 100)
+  return { continueBlock, savingData, stop: false }
 }
 
 const fomatData = (data) => {
+  let type
+
+  if (
+    data.topics[0] ==
+    "0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30"
+  )
+    type = "DecreasePosition"
+  if (
+    data.topics[0] ==
+    "0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022"
+  )
+    type = "IncreasePosition"
+  if (
+    data.topics[0] ==
+    "0x2e1f85a64a2f22cf2f0c42584e7c919ed4abe8d53675cff0f62bf1e95a1c676f"
+  )
+    type = "LiquidatePosition"
+
   return {
-    insertOne: {
-      document: {
-        txHash: data.transactionHash,
-        address: data.address,
-        topics: data.topics.toString(),
-        data: data.data,
-        blockNumber: parseInt(data.blockNumber).toString(),
-        timesStamp: parseInt(data.timeStamp).toString(),
-      },
-    },
+    type: type,
+    txHash: data.transactionHash,
+    address: data.address,
+    topics: data.topics.toString(),
+    data: data.data,
+    blockNumber: parseInt(data.blockNumber).toString(),
+    timesStamp: parseInt(data.timeStamp).toString(),
   }
+}
+
+const mergeData = async (data, lastBlock) => {
+  // const slicedString = inputString.substring(40, 64)
+  const resultArray = []
+  const rawArray = [...data[0], ...data[1], ...data[2]]
+    .filter(
+      (item) =>
+        item.data.slice(218, 258) == "82af49447d8a07e3bd95bd0d56f35241523fbab1",
+    )
+    .filter((obj) => obj.blockNumber < 2300000)
+    .sort((a, b) => Number(a.blockNumber) - Number(b.blockNumber))
+
+  fs = require("fs")
+  let ifaceDecrease = new utils.Interface([
+    "event DecreasePosition (bytes32 key, address account, address collateralToken, address indexToken, uint256 collateralDelta, uint256 sizeDelta, bool isLong, uint256 price, uint256 fee)",
+  ])
+  let ifaceIncrease = new utils.Interface([
+    "event IncreasePosition (bytes32 key, address account, address collateralToken, address indexToken, uint256 collateralDelta, uint256 sizeDelta, bool isLong, uint256 price, uint256 fee)",
+  ])
+  let ifaceLiquidate = new utils.Interface([
+    "event LiquidatePosition (bytes32 key, address account, address collateralToken, address indexToken, bool isLong, uint256 size, uint256 collateral, uint256 reserveAmount, int256 realisedPnl, uint256 markPrice)",
+  ])
+  rawArray.forEach((tx) => {
+    let iface
+    if (tx.type == "DecreasePosition") iface = ifaceDecrease
+    if (tx.type == "IncreasePosition") iface = ifaceIncrease
+    if (tx.type == "LiquidatePosition") iface = ifaceLiquidate
+    const parsedLogs = iface.parseLog({
+      topics: [tx.topics],
+      data: tx.data,
+    })
+    resultArray.push({
+      type: tx.type,
+      key: parsedLogs.args.key,
+      account: parsedLogs.args.account,
+      collateralToken: parsedLogs.args.collateralToken,
+      collateralDelta: parsedLogs.args.collateralDelta
+        ? parsedLogs.args.collateralDelta.toString()
+        : "null",
+      sizeDelta: parsedLogs.args.sizeDelta
+        ? parsedLogs.args.sizeDelta.toString()
+        : "null",
+      isLong: parsedLogs.args.isLong,
+      price: parsedLogs.args.price ? parsedLogs.args.price.toString() : "null",
+      collateral: parsedLogs.args.collateral
+        ? parsedLogs.args.collateral.toString()
+        : "null",
+      reserveAmount: parsedLogs.args.reserveAmount
+        ? parsedLogs.args.reserveAmount.toString()
+        : "null",
+    })
+  })
+  let result = JSON.stringify(resultArray)
+  await fs.writeFileSync("data.json", result, (error) => {})
+  process.exit()
+}
+
+const wait = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const findKey = async () => {
@@ -143,12 +242,14 @@ const decode = async () => {
     const parsedLogs = iface.parseLog(data)
     const saveData = {
       txHash: log.txHash,
-      size: parsedLogs.args.size.toString(),
-      collateral: parsedLogs.args.collateral.toString(),
-      leverage: (parsedLogs.args.size / parsedLogs.args.collateral).toString(),
-      averagePrice: parsedLogs.args.averagePrice.toString(),
-      reserveAmount: parsedLogs.args.reserveAmount.toString(),
-      key: parsedLogs.args.key,
+      size: parsedLogs.args.args.size.toString(),
+      collateral: parsedLogs.args.args.collateral.toString(),
+      leverage: (
+        parsedLogs.args.args.size / parsedLogs.args.args.collateral
+      ).toString(),
+      averagePrice: parsedLogs.args.args.averagePrice.toString(),
+      reserveAmount: parsedLogs.args.args.reserveAmount.toString(),
+      key: parsedLogs.args.args.key,
       timesStamp: parseInt(log.timesStamp),
     }
     let newUpdate = new update(saveData)
