@@ -25,10 +25,7 @@ const update = require("../models/liquidate")
 fs = require("fs")
 
 const getData = async () => {
-  findKey()
-  // toJson()
-  // decode()
-  // await getApi(0, 41000000) //26024907
+  await getApi(0, 41000000) //26024907
 }
 
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
@@ -43,6 +40,14 @@ const getApi = async (fromBlock, toBlock) => {
   console.log(url)
   try {
     const body = JSON.parse(await response.text())
+    if (body.status == '0') {
+      console.log('FALSE',{
+        fromBlock,
+        toBlock
+      })
+      process.exit()
+    }
+    console.log(body.status)
     const lastBlock = parseInt(
       body.result[body.result.length - 1].blockNumber,
       16,
@@ -52,52 +57,7 @@ const getApi = async (fromBlock, toBlock) => {
     console.log(error, { fromBlock, toBlock })
     setTimeout(() => {
       getApi(fromBlock, toBlock)
-    }, 4000)
-  }
-}
-
-const toJson = async () => {
-  let data = await update
-    .find(
-      { indexToken: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" },
-      {
-        _id: 0,
-        __v: 0,
-      },
-    )
-    .lean()
-  fs = require("fs")
-  console.log(data.length)
-  let result = JSON.stringify(data)
-  await fs.writeFileSync("liquidate.json", result, (error) => {})
-}
-
-const decode = async () => {
-  let iface = new utils.Interface([
-    "event UpdatePosition (bytes32 key, uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, uint256 reserveAmount, int256 realisedPnl)",
-  ])
-  const logs = await DataDb.find({ blockNumber: { $lt: 2500000 } })
-  console.log(logs.length)
-  for await (let log of logs) {
-    const data = {
-      topics: [log.topics],
-      data: log.data,
-    }
-    console.log(log)
-    const parsedLogs = iface.parseLog(data)
-    const saveData = {
-      txHash: log.txHash,
-      size: parsedLogs.args.size.toString(),
-      collateral: parsedLogs.args.collateral.toString(),
-      leverage: (parsedLogs.args.size / parsedLogs.args.collateral).toString(),
-      averagePrice: parsedLogs.args.averagePrice.toString(),
-      reserveAmount: parsedLogs.args.reserveAmount.toString(),
-      key: parsedLogs.args.key,
-      timesStamp: parseInt(log.timesStamp),
-    }
-    let newUpdate = new update(saveData)
-    await newUpdate.save()
-    // console.log("@@@@", saveData)
+    }, 5000)
   }
 }
 
@@ -150,6 +110,51 @@ const findKey = async () => {
   // console.log(data.length)
   let result = JSON.stringify(filteredArray)
   await fs.writeFileSync("closee.json", result, (error) => {})
+}
+
+const toJson = async () => {
+  let data = await update
+    .find(
+      { indexToken: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" },
+      {
+        _id: 0,
+        __v: 0,
+      },
+    )
+    .lean()
+  fs = require("fs")
+  console.log(data.length)
+  let result = JSON.stringify(data)
+  await fs.writeFileSync("liquidate.json", result, (error) => {})
+}
+
+const decode = async () => {
+  let iface = new utils.Interface([
+    "event UpdatePosition (bytes32 key, uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, uint256 reserveAmount, int256 realisedPnl)",
+  ])
+  const logs = await DataDb.find({ blockNumber: { $lt: 2500000 } })
+  console.log(logs.length)
+  for await (let log of logs) {
+    const data = {
+      topics: [log.topics],
+      data: log.data,
+    }
+    console.log(log)
+    const parsedLogs = iface.parseLog(data)
+    const saveData = {
+      txHash: log.txHash,
+      size: parsedLogs.args.size.toString(),
+      collateral: parsedLogs.args.collateral.toString(),
+      leverage: (parsedLogs.args.size / parsedLogs.args.collateral).toString(),
+      averagePrice: parsedLogs.args.averagePrice.toString(),
+      reserveAmount: parsedLogs.args.reserveAmount.toString(),
+      key: parsedLogs.args.key,
+      timesStamp: parseInt(log.timesStamp),
+    }
+    let newUpdate = new update(saveData)
+    await newUpdate.save()
+    // console.log("@@@@", saveData)
+  }
 }
 
 const checkContract = async () => {
