@@ -24,18 +24,19 @@ const DataDb = require("../models/LiquidatePosition")
 const update = require("../models/liquidate")
 fs = require("fs")
 
-const getHolder = async () => {
+const getData = async () => {
   findKey()
   // toJson()
   // decode()
   // await getApi(0, 41000000) //26024907
-  // console.log(await DataDb.find())
 }
+
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
 // 0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022 IncreasePosition
 // 0x2e1f85a64a2f22cf2f0c42584e7c919ed4abe8d53675cff0f62bf1e95a1c676f LiquidatePosition
 // 0x25e8a331a7394a9f09862048843323b00bdbada258f524f5ce624a45bf00aabb UpdatePosition
 // 0x73af1d417d82c240fdb6d319b34ad884487c6bf2845d98980cc52ad9171cb455 ClosePosition
+
 const getApi = async (fromBlock, toBlock) => {
   const url = `https://api.arbiscan.io/api?module=logs&action=getLogs&topic0=0x25e8a331a7394a9f09862048843323b00bdbada258f524f5ce624a45bf00aabb&fromBlock=${fromBlock}&toBlock=${toBlock}&apikey=${api_key}`
   const response = await fetch(url)
@@ -55,30 +56,32 @@ const getApi = async (fromBlock, toBlock) => {
   }
 }
 
-const toJson = async() => {
-  let data = await update.find(
-    {indexToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'},
-    {
-      _id: 0,
-      __v: 0
-    },
-  ).lean();
-  fs = require("fs");
+const toJson = async () => {
+  let data = await update
+    .find(
+      { indexToken: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" },
+      {
+        _id: 0,
+        __v: 0,
+      },
+    )
+    .lean()
+  fs = require("fs")
   console.log(data.length)
-  let result = JSON.stringify(data);
-  await fs.writeFileSync("liquidate.json", result, (error) => {});
+  let result = JSON.stringify(data)
+  await fs.writeFileSync("liquidate.json", result, (error) => {})
 }
 
 const decode = async () => {
   let iface = new utils.Interface([
     "event UpdatePosition (bytes32 key, uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, uint256 reserveAmount, int256 realisedPnl)",
   ])
-  const logs = await DataDb.find({blockNumber: {$lt: 2500000}})
+  const logs = await DataDb.find({ blockNumber: { $lt: 2500000 } })
   console.log(logs.length)
   for await (let log of logs) {
     const data = {
       topics: [log.topics],
-      data: log.data
+      data: log.data,
     }
     console.log(log)
     const parsedLogs = iface.parseLog(data)
@@ -86,11 +89,11 @@ const decode = async () => {
       txHash: log.txHash,
       size: parsedLogs.args.size.toString(),
       collateral: parsedLogs.args.collateral.toString(),
-      leverage: ((parsedLogs.args.size)/(parsedLogs.args.collateral)).toString(),
+      leverage: (parsedLogs.args.size / parsedLogs.args.collateral).toString(),
       averagePrice: parsedLogs.args.averagePrice.toString(),
       reserveAmount: parsedLogs.args.reserveAmount.toString(),
       key: parsedLogs.args.key,
-      timesStamp: parseInt(log.timesStamp)
+      timesStamp: parseInt(log.timesStamp),
     }
     let newUpdate = new update(saveData)
     await newUpdate.save()
@@ -135,20 +138,19 @@ const fomatData = (data) => {
   }
 }
 
-const findKey = async() => {
+const findKey = async () => {
   const increase = require("../increase.json")
   const update = require("../close.json")
   console.log(update.length)
   const filteredArray = update.filter((obj1) => {
-    return increase.some((obj2) => obj2.key === obj1.key);
-  });
-  console.log(filteredArray.length);
+    return increase.some((obj2) => obj2.key === obj1.key)
+  })
+  console.log(filteredArray.length)
   // fs = require("fs");
   // console.log(data.length)
-  let result = JSON.stringify(filteredArray);
-  await fs.writeFileSync("closee.json", result, (error) => {});
+  let result = JSON.stringify(filteredArray)
+  await fs.writeFileSync("closee.json", result, (error) => {})
 }
-
 
 const checkContract = async () => {
   let holder = await Address.find({})
@@ -409,14 +411,5 @@ async function pairSwap(contract_address) {
 }
 
 module.exports = {
-  getHolder,
-  calculateBalance,
-  getTx,
-  getTxInfo,
-  getPrice,
-  checkContract,
-  checkWalletContract,
-  getTo,
-  format,
-  userSwap,
+  getData,
 }
