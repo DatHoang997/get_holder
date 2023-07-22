@@ -12,7 +12,7 @@ const swapXContract = [
 
 const lz_address = "0x3b78458981eb7260d1f781cb8be2caac7027dbe2";
 
-const api_key = "VSUEYZSSBWGFSMZ9XU1RECMWZWVMQ4R3G9";
+const api_key = "G4UZWDHIR33H59QNXBQF8IR6XQSD521BGV";
 
 const bn = ethers.BigNumber.from;
 

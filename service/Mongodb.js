@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const mongo_url = "mongodb://localhost:27017/hacked";
+const mongo_url = "mongodb://localhost/test";
 
 mongoConnection = async () => {
     return mongoose

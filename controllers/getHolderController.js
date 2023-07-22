@@ -7,7 +7,6 @@ const Wallet = require("../models/events");
 const BottomFishing = require("../models/bottom_fishing");
 const Lp = require("../models/lp");
 const Address = require("../models/address");
-const data1 = require("../data1.json");
 const data = require("../data.json");
 const Tx = require("../models/tx");
 

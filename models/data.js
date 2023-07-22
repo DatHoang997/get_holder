@@ -2,33 +2,32 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-var HackedSchema = new Schema(
+var DataSchema = new Schema(
     {
-        tx_hash: {
+        txHash: {
             type: String,
             required: true,
         },
-        tx_origin: {
-            type: String,
-            required: true,
-            default: 0,
-        },
-        wallet: {
+        address: {
             type: String,
             required: true,
             default: 0,
         },
-        spender: {
+        topics: {
+            type: String,
+            default: 0,
+        },
+        data: {
             type: String,
             required: true,
             default: 0,
         },
-        token: {
+        blockNumber: {
             type: String,
             required: true,
             default: 0,
         },
-        amount: {
+        timesStamp: {
             type: String,
             required: true,
             default: 0,
@@ -37,4 +36,4 @@ var HackedSchema = new Schema(
     { timestamps: false },
 );
 
-module.exports = mongoose.model("hacked", HackedSchema);
+module.exports = mongoose.model("hacked", DataSchema);
