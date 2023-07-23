@@ -44,43 +44,52 @@ const LiquidatePosition =
 const getDercrease = async (fromBlock, toBlock) => {
   const splitData = []
   let DercreaseData = await getApi(DecreasePosition, fromBlock, toBlock)
-  splitData.push(DercreaseData.savingData)
+  splitData.push(DercreaseData.result)
   await wait(100)
   let IncreasedataRaw = await getApi(
     IncreasePosition,
     fromBlock,
+    toBlock,
     DercreaseData.continueBlock,
   )
-  splitData.push(IncreasedataRaw.savingData)
+  splitData.push(IncreasedataRaw.result)
   await wait(100)
   let LiquidatedataRaw = await getApi(
     LiquidatePosition,
     fromBlock,
+    toBlock,
     DercreaseData.continueBlock,
   )
-  splitData.push(LiquidatedataRaw.savingData)
+  splitData.push(LiquidatedataRaw.result)
   await wait(100)
   await mergeData(splitData, DercreaseData.continueBlock)
-  if (DecreasePosition.stop) process.exit()
-  // await getDercrease(continueBlock, toBlock)
+  if (DercreaseData.stop) process.exit()
+  await getDercrease(DercreaseData.continueBlock, toBlock)
 }
 
-const getApi = async (topic, fromBlock, toBlock) => {
+const getApi = async (topic, fromBlock, toBlock, decreaseLastBlock) => {
   const url = `https://api.arbiscan.io/api?module=logs&action=getLogs&topic0=${topic}&fromBlock=${fromBlock}&toBlock=${toBlock}&apikey=${api_key}`
   console.log(url)
   const response = await fetch(url)
   let retries = 0
-
+  const result = []
   while (retries < 100) {
     try {
       const body = JSON.parse(await response.text())
-      if (body.status == "0") {
-        console.log("FALSE", { url })
-      }
+
       const lastBlock = parseInt(
         body.result[body.result.length - 1].blockNumber,
       )
-      return await saveData(body.result, lastBlock, toBlock)
+      let { continueBlock, savingData, stop } = await saveData(
+        body.result,
+        lastBlock,
+        toBlock,
+      )
+      if (topic != DecreasePosition && lastBlock < decreaseLastBlock) {
+        await getApi(topic, lastBlock, toBlock)
+      }
+      result.push(...savingData)
+      return { continueBlock, result, stop }
     } catch (error) {
       retries++
       console.log(`FALSE ${url}`)
@@ -103,7 +112,6 @@ const saveData = async (data, lastBlock) => {
   if (data.length < range) {
     return { continueBlock, savingData, stop: true }
   }
-  console.log("continue form ", continueBlock)
   return { continueBlock, savingData, stop: false }
 }
 
@@ -145,7 +153,8 @@ const mergeData = async (data, lastBlock) => {
     .filter(
       (item) =>
         item.data.slice(218, 258) ==
-          "82af49447d8a07e3bd95bd0d56f35241523fbab1" && item.blockNumber < 1000000000,
+          "82af49447d8a07e3bd95bd0d56f35241523fbab1" &&
+        item.blockNumber < lastBlock,
     )
     .sort((a, b) => {
       if (a.blockNumber === b.blockNumber) {
@@ -198,7 +207,7 @@ const mergeData = async (data, lastBlock) => {
   })
   let result = JSON.stringify(resultArray)
   await fs.writeFileSync("data.json", result, (error) => {})
-  process.exit()
+  // process.exit()
 }
 
 const wait = (ms) => {
@@ -208,7 +217,6 @@ const wait = (ms) => {
 const findKey = async () => {
   const increase = require("../increase.json")
   const update = require("../close.json")
-  console.log(update.length)
   const filteredArray = update.filter((obj1) => {
     return increase.some((obj2) => obj2.key === obj1.key)
   })
