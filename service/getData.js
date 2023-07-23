@@ -132,8 +132,9 @@ const fomatData = (data) => {
     address: data.address,
     topics: data.topics.toString(),
     data: data.data,
-    blockNumber: parseInt(data.blockNumber).toString(),
-    timesStamp: parseInt(data.timeStamp).toString(),
+    blockNumber: parseInt(data.blockNumber),
+    timesStamp: parseInt(data.timeStamp),
+    logIndex: parseInt(data.logIndex),
   }
 }
 
@@ -143,10 +144,15 @@ const mergeData = async (data, lastBlock) => {
   const rawArray = [...data[0], ...data[1], ...data[2]]
     .filter(
       (item) =>
-        item.data.slice(218, 258) == "82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        item.data.slice(218, 258) ==
+          "82af49447d8a07e3bd95bd0d56f35241523fbab1" && item.blockNumber < 1000000000,
     )
-    .filter((obj) => obj.blockNumber < 2300000)
-    .sort((a, b) => Number(a.blockNumber) - Number(b.blockNumber))
+    .sort((a, b) => {
+      if (a.blockNumber === b.blockNumber) {
+        return a.logsIndex - b.logsIndex
+      }
+      return a.blockNumber - b.blockNumber
+    })
 
   fs = require("fs")
   let ifaceDecrease = new utils.Interface([
@@ -186,6 +192,8 @@ const mergeData = async (data, lastBlock) => {
       reserveAmount: parsedLogs.args.reserveAmount
         ? parsedLogs.args.reserveAmount.toString()
         : "null",
+      blockNumber: tx.blockNumber,
+      timesStamp: tx.timesStamp,
     })
   })
   let result = JSON.stringify(resultArray)
