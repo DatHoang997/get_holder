@@ -134,7 +134,7 @@ const fomatData = (data) => {
     data: data.data,
     blockNumber: parseInt(data.blockNumber),
     timesStamp: parseInt(data.timeStamp),
-    logIndex: parseInt(data.logIndex),
+    logsIndex: parseInt(data.logIndex),
   }
 }
 
