@@ -23,6 +23,7 @@ const tokenAbi = require("../abi/erc20token.json")
 const DataDb = require("../models/LiquidatePosition")
 const update = require("../models/liquidate")
 fs = require("fs")
+let result = []
 
 const getData = async () => {
   await getDercrease(0, 40000000) //26024907
@@ -45,6 +46,7 @@ const getDercrease = async (fromBlock, toBlock) => {
   const splitData = []
   let DercreaseData = await getApi(DecreasePosition, fromBlock, toBlock)
   splitData.push(DercreaseData.result)
+  result = []
   await wait(100)
   let IncreasedataRaw = await getApi(
     IncreasePosition,
@@ -53,6 +55,7 @@ const getDercrease = async (fromBlock, toBlock) => {
     DercreaseData.continueBlock,
   )
   splitData.push(IncreasedataRaw.result)
+  result = []
   await wait(100)
   let LiquidatedataRaw = await getApi(
     LiquidatePosition,
@@ -61,6 +64,7 @@ const getDercrease = async (fromBlock, toBlock) => {
     DercreaseData.continueBlock,
   )
   splitData.push(LiquidatedataRaw.result)
+  result = []
   await wait(100)
   await mergeData(splitData, DercreaseData.continueBlock)
   if (DercreaseData.stop) process.exit()
@@ -72,7 +76,6 @@ const getApi = async (topic, fromBlock, toBlock, decreaseLastBlock) => {
   console.log(url)
   const response = await fetch(url)
   let retries = 0
-  const result = []
   while (retries < 100) {
     try {
       const body = JSON.parse(await response.text())
@@ -85,10 +88,10 @@ const getApi = async (topic, fromBlock, toBlock, decreaseLastBlock) => {
         lastBlock,
         toBlock,
       )
+      result.push(...savingData)
       if (topic != DecreasePosition && lastBlock < decreaseLastBlock) {
         await getApi(topic, lastBlock, toBlock)
       }
-      result.push(...savingData)
       return { continueBlock, result, stop }
     } catch (error) {
       retries++
@@ -104,7 +107,7 @@ const saveData = async (data, lastBlock) => {
   let continueBlock = lastBlock - 1
   const savingData = []
   for await (let a of data) {
-    if (data.length == range && a.blockNumber == lastBlock) {
+    if (data.length == range && parseInt(a.blockNumber) == lastBlock) {
       continue
     }
     savingData.push(fomatData(a))
@@ -184,6 +187,7 @@ const mergeData = async (data, lastBlock) => {
     })
     resultArray.push({
       type: tx.type,
+      txHash: tx.txHash,
       key: parsedLogs.args.key,
       account: parsedLogs.args.account,
       collateralToken: parsedLogs.args.collateralToken,
