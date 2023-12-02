@@ -1,12 +1,9 @@
-const {
-    crawlData,
-} = require("./service/get_data");
-
-const { mongoConnection } = require("./service/Mongodb");
+const { crawlData } = require("./service/get_data")
+const { mongoConnection } = require("./service/Mongodb")
 
 start = async () => {
-    await mongoConnection();
-    crawlData();
-};
+  await mongoConnection()
+  crawlData()
+}
 
-start();
+start()

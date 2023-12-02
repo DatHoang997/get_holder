@@ -2,7 +2,7 @@
 const Web3 = require("web3")
 const { utils } = require("ethers")
 const fetch = require("node-fetch")
-const cheerio = require('cheerio');
+const cheerio = require("cheerio")
 const {
   swapXContract,
   range,
@@ -16,12 +16,14 @@ const {
 const endpoint = "https://rpc.ankr.com/bsc"
 const web3Default = new Web3(endpoint)
 const tokenAbi = require("../abi/erc20token.json")
+const cron = require("node-cron")
 fs = require("fs")
 
 const crawlData = async () => {
-  // const url = 'https://moianhxoi.xyz/billingreport/CMSBillingReport/HistoryByCardPartial?accountName=&nickName=&status=-1&beginDate=2023-12-02&endDate=2023-12-02&cardType=-1&portalId=2'
-  // const response = await fetch(url, {
-  //   method: "GET", // *GET, POST, PUT, DELETE, etc.
+  cron.schedule("* * * * *", () => {
+    // const url = 'https://moianhxoi.xyz/billingreport/CMSBillingReport/HistoryByCardPartial?accountName=&nickName=&status=-1&beginDate=2023-12-02&endDate=2023-12-02&cardType=-1&portalId=2'
+    // const response = await fetch(url, {
+    //   method: "GET", // *GET, POST, PUT, DELETE, etc.
     // mode: "cors", // no-cors, *cors, same-origin
     // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     // credentials: "same-origin", // include, *same-origin, omit
@@ -45,38 +47,168 @@ const crawlData = async () => {
     // redirect: "follow", // manual, *follow, error
     // referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     // body: JSON.stringify(data), // body data type must match "Content-Type" header
-  // });
-  // console.log(response)
-  // const body = await response.text()
-  const body = 
-  const document = cheerio.load(body);
+    // });
+    // console.log(response)
+    // const body = await response.text()
+    const body = `
+  <!-- saved from url=(0214)https://moianhxoi.xyz/billingreport/CMSBillingReport/HistoryTopUpCardPartial?beginDate=2023-11-30&endDate=2023-11-30&accountName=&nickName=&cardCode=&cardSerial=&cardType=-1&cardValue=-1&paymentSource=-1&portalId=2 -->
+  <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><table class="table table-striped table-bordered dataTable" border="1" role="grid" aria-describedby="example_info" width="100%" style="width: 100%;" id="dataTables">
+          <thead>
+              <tr class="info">
+                  <th style="text-align:center;">STT</th>
+                  <th style="text-align:center;">Ngày</th>
+                  <th style="text-align:center;">Tài Khoản</th>
+                  <th style="text-align:center;">Nhân Vật</th>
+                  <th style="text-align:center;">Nhà Mạng</th>
+                  <th style="text-align:center;">Mệnh Giá</th>
+                  <th style="text-align:center;">Serial</th>
+                  <th style="text-align:center;">Mã Thẻ</th>
+                  <th style="text-align:center;">Kênh Nạp</th>
+                  <th style="text-align:center;">Trạng Thái</th>
+              </tr>
+          </thead>
+              <tbody>
+                      <tr role="row">
+                          <td>1</td>
+                          <td>30/11/2023 22:11:23</td>
+                          <td>C_hungnoroi</td>
+                          <td>[C] conlaimaycha3</td>
+                          <td>Viettel</td>
+                          <td>50,000</td>
+                          <td>10010169231338</td>
+                          <td>914287881598355</td>
+                          <td>Kênh 10</td>
+                              <td>Thành Công</td>
+                      </tr>
+                      <tr role="row">
+                          <td>2</td>
+                          <td>30/11/2023 22:10:39</td>
+                          <td>C_ntdk2006</td>
+                          <td>[C] diemkieu06</td>
+                          <td>MobiFone</td>
+                          <td>50,000</td>
+                          <td>096822001493158</td>
+                          <td>887094940453</td>
+                          <td>Kênh 10</td>
+                              <td>Thành Công</td>
+                      </tr>
+                      <tr role="row">
+                          <td>3</td>
+                          <td>30/11/2023 22:10:33</td>
+                          <td>C_tuanan00</td>
+                          <td>[C] xepkhung00</td>
+                          <td>Viettel</td>
+                          <td>50,000</td>
+                          <td>10010236114882</td>
+                          <td>913327254399997</td>
+                          <td>Kênh 11</td>
+                              <td>Thành Công</td>
+                      </tr>
+              </tbody>
+      </table>
+      <script type="text/javascript">
+          $(function () {
+              var table = $('#dataTables').DataTable({
+                  "ordering": false,
+                  dom: 'Bfrtp',
+                  lengthMenu: [
+                      [10, 25, 50],
+                      ['10 rows', '25 rows', '50 rows']
+                  ],
+                  buttons: [
+                      {
+                          extend: 'collection',
+                          text: "<i class='fa fa-cloud-download'></i>Xuất dữ liệu",
+                          buttons: [
+                              {
+                                  extend: 'excelHtml5',
+                                  text: "<i class='fa fa-file-excel-o'></i>Excel",
+                                  tableId: 'dataTables',
+                                  exportOptions: {
+                                      columns: ':visible'
+                                  },
+                                  footer: false,
+                                  title: '',
+                                  filename: ''
+                              },
+                              {
+                                  extend: 'csvHtml5',
+                                  text: "<i class='fa fa-file-excel-o'></i>CSV",
+                                  tableId: 'dataTables',
+                                  exportOptions: {
+                                      columns: ':visible'
+                                  },
+                                  footer: false,
+                                  title: '',
+                                  filename: ''
+                              },
+                              {
+                                  extend: 'copy',
+                                  exportOptions: {
+                                      columns: ':visible'
+                                  },
+                                  text: "<i class='fa fa-copy'></i>Copy",
+                                  footer: false,
+                                  title: ''
+                              },
+                              {
+                                  extend: 'print',
+                                  text: "<i class='fa fa-print'></i>Print",
+                                  autoPrint: true,
+                                  customize: function (doc) {
+                                      console.log(doc);
+                                  },
+                                  footer: false,
+                                  title: ''
+                              }
+                          ]
+                      },
+                      'pageLength',
+                      {
+                          extend: "colvis",
+                          text: "<i class='fa fa-eye-slash'></i>Ẩn/hiện cột"
+                      }
+                  ],
+                  "aaSorting": [[0, 'desc']],
+                  "bSort": true,
+                  "fnDrawCallback": function (oSettings) {
+                      console.log(oSettings);
+                  },
+                  searching: false,
+                  pageLength: 25,
+                  reponsive: true
+              });
+              table.buttons().container().appendTo('#example_wrapper .col-sm-6:eq(0)');
+              $('#dataTables').on('page.dt', function () {
+                  $("html,body").animate({ scrollTop: $('#dataTables').offset().top - 100 }, 'fast');
+              });
+          });
+      </script>
 
-  const data = [];
-  const rows = document('tr.info')
-  console.log('@@@@', rows)
-  // const tableBody = document.querySelector('tbody');
-  // const rows = tableBody.querySelectorAll('tr');
+  </body></html>`
+    const $ = cheerio.load(body)
 
-  // for (const row of rows) {
-  //   const cells = row.querySelectorAll('td');
+    const result = []
 
-  //   const rowData = {
-  //     stt: parseInt(cells[0].textContent),
-  //     date: cells[1].textContent,
-  //     accountName: cells[2].textContent,
-  //     nickName: cells[3].textContent,
-  //     network: cells[4].textContent,
-  //     denomination: parseInt(cells[5].textContent),
-  //     serial: cells[6].textContent,
-  //     cardCode: cells[7].textContent,
-  //     topUpChannel: cells[8].textContent,
-  //     status: cells[9].textContent
-  //   };
+    $("tbody tr").each((index, element) => {
+      const columns = $(element).find("td")
+      const rowData = {
+        STT: columns.eq(0).text(),
+        Ngay: columns.eq(1).text(),
+        TaiKhoan: columns.eq(2).text(),
+        NhanVat: columns.eq(3).text(),
+        NhaMang: columns.eq(4).text(),
+        MenhGia: columns.eq(5).text(),
+        Serial: columns.eq(6).text(),
+        MaThe: columns.eq(7).text(),
+        KenhNap: columns.eq(8).text(),
+        TrangThai: columns.eq(9).text(),
+      }
+      result.push(rowData)
+    })
 
-  //   data.push(rowData);
-  // }
-
-  // console.log(data);
+    console.log(result)
+  })
 }
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
 // 0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022 IncreasePosition
@@ -102,30 +234,32 @@ const getApi = async (fromBlock, toBlock) => {
   }
 }
 
-const toJson = async() => {
-  let data = await update.find(
-    {indexToken: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'},
-    {
-      _id: 0,
-      __v: 0
-    },
-  ).lean();
-  fs = require("fs");
+const toJson = async () => {
+  let data = await update
+    .find(
+      { indexToken: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" },
+      {
+        _id: 0,
+        __v: 0,
+      },
+    )
+    .lean()
+  fs = require("fs")
   console.log(data.length)
-  let result = JSON.stringify(data);
-  await fs.writeFileSync("liquidate.json", result, (error) => {});
+  let result = JSON.stringify(data)
+  await fs.writeFileSync("liquidate.json", result, (error) => {})
 }
 
 const decode = async () => {
   let iface = new utils.Interface([
     "event UpdatePosition (bytes32 key, uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, uint256 reserveAmount, int256 realisedPnl)",
   ])
-  const logs = await DataDb.find({blockNumber: {$lt: 2500000}})
+  const logs = await DataDb.find({ blockNumber: { $lt: 2500000 } })
   console.log(logs.length)
   for await (let log of logs) {
     const data = {
       topics: [log.topics],
-      data: log.data
+      data: log.data,
     }
     console.log(log)
     const parsedLogs = iface.parseLog(data)
@@ -133,11 +267,11 @@ const decode = async () => {
       txHash: log.txHash,
       size: parsedLogs.args.size.toString(),
       collateral: parsedLogs.args.collateral.toString(),
-      leverage: ((parsedLogs.args.size)/(parsedLogs.args.collateral)).toString(),
+      leverage: (parsedLogs.args.size / parsedLogs.args.collateral).toString(),
       averagePrice: parsedLogs.args.averagePrice.toString(),
       reserveAmount: parsedLogs.args.reserveAmount.toString(),
       key: parsedLogs.args.key,
-      timesStamp: parseInt(log.timesStamp)
+      timesStamp: parseInt(log.timesStamp),
     }
     let newUpdate = new update(saveData)
     await newUpdate.save()
@@ -182,20 +316,19 @@ const fomatData = (data) => {
   }
 }
 
-const findKey = async() => {
+const findKey = async () => {
   const increase = require("../increase.json")
   const update = require("../close.json")
   console.log(update.length)
   const filteredArray = update.filter((obj1) => {
-    return increase.some((obj2) => obj2.key === obj1.key);
-  });
-  console.log(filteredArray.length);
+    return increase.some((obj2) => obj2.key === obj1.key)
+  })
+  console.log(filteredArray.length)
   // fs = require("fs");
   // console.log(data.length)
-  let result = JSON.stringify(filteredArray);
-  await fs.writeFileSync("closee.json", result, (error) => {});
+  let result = JSON.stringify(filteredArray)
+  await fs.writeFileSync("closee.json", result, (error) => {})
 }
-
 
 const checkContract = async () => {
   let holder = await Address.find({})
