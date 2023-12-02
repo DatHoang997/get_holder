@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ethersproject/providers": "https://github.com/launchzone/ethers.js/releases/download/v5.3.1.1/ethers_providers.tar.gz",
     "@moralisweb3/core": "^2.7.4",
     "@moralisweb3/evm": "^2.0.0-alpha.2",
     "@moralisweb3/evm-api": "^2.15.0",

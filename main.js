@@ -1,24 +1,12 @@
 const {
-    getHolder,
-    calculateBalance,
-    getTx,
-    getTxInfo,
-    getPrice,
-    checkContract,
-    checkWalletContract,
-    getTo,
-    format,
-} = require("./service/get_holder");
-const {
-  userSwap,
-} = require("./service/user_swap");
+    crawlData,
+} = require("./service/get_data");
 
 const { mongoConnection } = require("./service/Mongodb");
-const { getProvider } = require("./service/AssistedProvider");
 
 start = async () => {
     await mongoConnection();
-    getHolder();
+    crawlData();
 };
 
 start();

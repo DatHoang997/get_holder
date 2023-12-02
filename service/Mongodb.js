@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
-const mongo_url = "mongodb://localhost/test";
+const mongo_url = "mongodb://127.0.0.1:27017/test";
 
 mongoConnection = async () => {
+  console.log('alooo')
     return mongoose
         .connect(mongo_url)
         .then(() => {

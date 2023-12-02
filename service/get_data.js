@@ -1,8 +1,3 @@
-const Wallet = require("../models/events")
-const Lp = require("../models/lp")
-const Tx = require("../models/tx")
-const HackedData = require("../models/hacked_data")
-const Address = require("../models/address")
 // const data = require("../data.json")
 const Web3 = require("web3")
 const { utils } = require("ethers")
@@ -20,16 +15,39 @@ const {
 const endpoint = "https://rpc.ankr.com/bsc"
 const web3Default = new Web3(endpoint)
 const tokenAbi = require("../abi/erc20token.json")
-const DataDb = require("../models/LiquidatePosition")
-const update = require("../models/liquidate")
 fs = require("fs")
 
-const getHolder = async () => {
-  findKey()
-  // toJson()
-  // decode()
-  // await getApi(0, 41000000) //26024907
-  // console.log(await DataDb.find())
+const crawlData = async () => {
+  const url = 'https://developer.mozilla.org/api/v2/collections/'
+  const response = await fetch(url, {
+    method: "GET", // *GET, POST, PUT, DELETE, etc.
+    // mode: "cors", // no-cors, *cors, same-origin
+    // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    // credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9,vi-VN;q=0.8,vi;q=0.7",
+      "Cache-Control": "max-age=0",
+      "Cookie": "auth-cookie=4i9VBLP5OvAFvvFWNCmMUIBBhXsvdSWG9KkaGflBl%2FeMJ1G2DH1nNn8VoSfwrdwVYc%2FZ+daezclW9rrHMjUXoKRVXY8F8UcEanSjMHQAfDtaQBOOvm3WWuMr10ch",
+      "Dnt": "1",
+      "Sec-Ch-Ua": '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+      "Sec-Ch-Ua-Mobile":"?0",
+      "Sec-Ch-Ua-Platform": "Windows",
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "none",
+      "Sec-Fetch-User": "?1",
+      "Upgrade-Insecure-Requests":"1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    },
+    // redirect: "follow", // manual, *follow, error
+    // referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    // body: JSON.stringify(data), // body data type must match "Content-Type" header
+  });
+  console.log(response)
+  const body = JSON.parse(await response.text())
+  console.log(body)
 }
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
 // 0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022 IncreasePosition
@@ -409,11 +427,10 @@ async function pairSwap(contract_address) {
 }
 
 module.exports = {
-  getHolder,
+  crawlData,
   calculateBalance,
   getTx,
   getTxInfo,
-  getPrice,
   checkContract,
   checkWalletContract,
   getTo,
