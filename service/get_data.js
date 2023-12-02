@@ -1,10 +1,12 @@
-// const data = require("../data.json")
+const Data = require("../models/data")
 const fetch = require("node-fetch")
 const cheerio = require("cheerio")
 const cron = require("node-cron")
 fs = require("fs")
 
 const crawlData = async () => {
+  console.log('save')
+  await Data.insertMany({ Ngay: '1111111111111' })
   cron.schedule("* * * * *", () => {
     // const url = 'https://moianhxoi.xyz/billingreport/CMSBillingReport/HistoryByCardPartial?accountName=&nickName=&status=-1&beginDate=2023-12-02&endDate=2023-12-02&cardType=-1&portalId=2'
     // const response = await fetch(url, {

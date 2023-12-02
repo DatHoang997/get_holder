@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const mongo_url = "mongodb://127.0.0.1:27017/test"
+const mongo_url = "mongodb://127.0.0.1:27017/testssss"
 
 mongoConnection = async () => {
   console.log("alooo")
