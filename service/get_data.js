@@ -2,6 +2,7 @@
 const Web3 = require("web3")
 const { utils } = require("ethers")
 const fetch = require("node-fetch")
+const cheerio = require('cheerio');
 const {
   swapXContract,
   range,
@@ -18,9 +19,9 @@ const tokenAbi = require("../abi/erc20token.json")
 fs = require("fs")
 
 const crawlData = async () => {
-  const url = 'https://thuysinhtim.vn/khoang-tep-cao-cap-nutrafin-100ml'
-  const response = await fetch(url, {
-    method: "GET", // *GET, POST, PUT, DELETE, etc.
+  // const url = 'https://moianhxoi.xyz/billingreport/CMSBillingReport/HistoryByCardPartial?accountName=&nickName=&status=-1&beginDate=2023-12-02&endDate=2023-12-02&cardType=-1&portalId=2'
+  // const response = await fetch(url, {
+  //   method: "GET", // *GET, POST, PUT, DELETE, etc.
     // mode: "cors", // no-cors, *cors, same-origin
     // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     // credentials: "same-origin", // include, *same-origin, omit
@@ -44,10 +45,38 @@ const crawlData = async () => {
     // redirect: "follow", // manual, *follow, error
     // referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     // body: JSON.stringify(data), // body data type must match "Content-Type" header
-  });
-  console.log(response)
-  const body = await response.text()
-  console.log(body)
+  // });
+  // console.log(response)
+  // const body = await response.text()
+  const body = 
+  const document = cheerio.load(body);
+
+  const data = [];
+  const rows = document('tr.info')
+  console.log('@@@@', rows)
+  // const tableBody = document.querySelector('tbody');
+  // const rows = tableBody.querySelectorAll('tr');
+
+  // for (const row of rows) {
+  //   const cells = row.querySelectorAll('td');
+
+  //   const rowData = {
+  //     stt: parseInt(cells[0].textContent),
+  //     date: cells[1].textContent,
+  //     accountName: cells[2].textContent,
+  //     nickName: cells[3].textContent,
+  //     network: cells[4].textContent,
+  //     denomination: parseInt(cells[5].textContent),
+  //     serial: cells[6].textContent,
+  //     cardCode: cells[7].textContent,
+  //     topUpChannel: cells[8].textContent,
+  //     status: cells[9].textContent
+  //   };
+
+  //   data.push(rowData);
+  // }
+
+  // console.log(data);
 }
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
 // 0x2fe68525253654c21998f35787a8d0f361905ef647c854092430ab65f2f15022 IncreasePosition
