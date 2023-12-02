@@ -1,13 +1,5 @@
-fs = require("fs");
-const HackedData = require("../models/hacked_data");
-const { ethers } = require("ethers");
-const bn = ethers.BigNumber.from;
 const apiResponse = require("../helpers/apiResponse");
-const BottomFishing = require("../models/bottom_fishing");
-const Lp = require("../models/lp");
-const Address = require("../models/address");
-const data = require("../data.json");
-const Tx = require("../models/tx");
+
 
 exports.sum = [
   async (req, res) => {
