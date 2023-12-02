@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "@moralisweb3/evm-utils": "^2.15.0",
     "@moralisweb3/evm-wallet-connect-connector": "^2.0.0-alpha.2",
     "assisted-json-rpc-provider": "^2.0.2",
+    "cheerio": "^1.0.0-rc.12",
     "cookie-parser": "^1.4.6",
     "ethers": "^5.1.4",
     "excel4node": "^1.8.0",

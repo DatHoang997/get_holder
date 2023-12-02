@@ -18,35 +18,35 @@ const tokenAbi = require("../abi/erc20token.json")
 fs = require("fs")
 
 const crawlData = async () => {
-  const url = 'https://developer.mozilla.org/api/v2/collections/'
+  const url = 'https://thuysinhtim.vn/khoang-tep-cao-cap-nutrafin-100ml'
   const response = await fetch(url, {
     method: "GET", // *GET, POST, PUT, DELETE, etc.
     // mode: "cors", // no-cors, *cors, same-origin
     // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     // credentials: "same-origin", // include, *same-origin, omit
-    headers: {
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "en-US,en;q=0.9,vi-VN;q=0.8,vi;q=0.7",
-      "Cache-Control": "max-age=0",
-      "Cookie": "auth-cookie=4i9VBLP5OvAFvvFWNCmMUIBBhXsvdSWG9KkaGflBl%2FeMJ1G2DH1nNn8VoSfwrdwVYc%2FZ+daezclW9rrHMjUXoKRVXY8F8UcEanSjMHQAfDtaQBOOvm3WWuMr10ch",
-      "Dnt": "1",
-      "Sec-Ch-Ua": '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
-      "Sec-Ch-Ua-Mobile":"?0",
-      "Sec-Ch-Ua-Platform": "Windows",
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "none",
-      "Sec-Fetch-User": "?1",
-      "Upgrade-Insecure-Requests":"1",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    },
+    // headers: {
+    //   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    //   "Accept-Encoding": "gzip, deflate, br",
+    //   "Accept-Language": "en-US,en;q=0.9,vi-VN;q=0.8,vi;q=0.7",
+    //   "Cache-Control": "max-age=0",
+    //   "Cookie": "auth-cookie=4i9VBLP5OvAFvvFWNCmMUIBBhXsvdSWG9KkaGflBl%2FeMJ1G2DH1nNn8VoSfwrdwVYc%2FZ+daezclW9rrHMjUXoKRVXY8F8UcEanSjMHQAfDtaQBOOvm3WWuMr10ch",
+    //   "Dnt": "1",
+    //   "Sec-Ch-Ua": '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+    //   "Sec-Ch-Ua-Mobile":"?0",
+    //   "Sec-Ch-Ua-Platform": "Windows",
+    //   "Sec-Fetch-Dest": "document",
+    //   "Sec-Fetch-Mode": "navigate",
+    //   "Sec-Fetch-Site": "none",
+    //   "Sec-Fetch-User": "?1",
+    //   "Upgrade-Insecure-Requests":"1",
+    //   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    // },
     // redirect: "follow", // manual, *follow, error
     // referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     // body: JSON.stringify(data), // body data type must match "Content-Type" header
   });
   console.log(response)
-  const body = JSON.parse(await response.text())
+  const body = await response.text()
   console.log(body)
 }
 // 0x93d75d64d1f84fc6f430a64fc578bdd4c1e090e90ea2d51773e626d19de56d30 DecreasePosition
