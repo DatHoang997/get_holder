@@ -3,7 +3,7 @@ const { mongoConnection } = require("./service/Mongodb")
 
 start = async () => {
   await mongoConnection()
-  crawlData()
+  // crawlData()
 }
 
 start()

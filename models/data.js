@@ -7,50 +7,43 @@ var addressSchema = new Schema(
     Ngay: {
       type: String,
       required: true,
+    },
+    TaiKhoan: {
+      type: String,
+      required: true,
+    },
+    NhanVat: {
+      type: String,
+      required: true,
+    },
+    NhaMang: {
+      type: String,
+      required: true,
+    },
+    MenhGia: {
+      type: String,
+      required: true,
+    },
+    Serial: {
+      type: String,
+      required: true,
       unique: true,
     },
-    // TaiKhoan: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // NhanVat: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // NhaMang: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // MenhGia: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // Serial: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // MaThe: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // KenhNap: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
-    // TrangThai: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
+    MaThe: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    KenhNap: {
+      type: String,
+      required: true,
+    },
+    TrangThai: {
+      type: String,
+      required: true,
+    },
   },
-  { timestamps: false },
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("address", addressSchema);

@@ -465,7 +465,7 @@ mongoose-long@^0.6.0:
   resolved "https://registry.npmjs.org/mongoose-long/-/mongoose-long-0.6.0.tgz"
   integrity sha512-yfniuvlo5vWMw6cV2xPVNhaxg/lgTxSXXFGI99HD3vK2fnZ0xwHJ0rzrRoYSsKwK+JFhhCciH54urY/HR9b4hg==
 
-mongoose@6.0.2:
+"mongoose@4.x || 5.x || 6.x", mongoose@6.0.2:
   version "6.0.2"
   resolved "https://registry.npmjs.org/mongoose/-/mongoose-6.0.2.tgz"
   integrity sha512-4zrCcScAItE9aefaPMeG9+IPLaJJ2c8sFLXlLvTVPdArZija10rto61qkzIxmhf6zkDmW2W9bh3DS59KuTPCfQ==
@@ -607,7 +607,7 @@ raw-body@2.5.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-regexp-clone@1.0.0, regexp-clone@^1.0.0:
+regexp-clone@^1.0.0, regexp-clone@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/regexp-clone/-/regexp-clone-1.0.0.tgz"
   integrity sha512-TuAasHQNamyyJ2hb97IuBEif4qBHGjPHBS64sZwytpLEqtBQ1gPJTnOaQ6qmpET16cK14kkjbazl6+p0RRv0yw==
@@ -719,7 +719,7 @@ type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-unpipe@1.0.0, unpipe@~1.0.0:
+unpipe@~1.0.0, unpipe@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/unpipe/-/unpipe-1.0.0.tgz"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
